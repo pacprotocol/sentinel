@@ -6,13 +6,13 @@ os.environ['SENTINEL_CONFIG'] = os.path.normpath(os.path.join(os.path.dirname(__
 os.environ['SENTINEL_ENV'] = 'test'
 sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), '../../lib')))
 import config
-from dash_config import DashConfig
+from pacprotocol_config import pacprotocolConfig
 
 
 @pytest.fixture
-def dash_conf(**kwargs):
+def pacprotocol_conf(**kwargs):
     defaults = {
-        'rpcuser': 'dashrpc',
+        'rpcuser': 'pacprotocolrpc',
         'rpcpassword': 'EwJeV3fZTyTVozdECF627BkBMnNDwQaVLakG3A4wXYyk',
         'rpcport': 29241,
     }
@@ -34,30 +34,30 @@ rpcport={rpcport}
 
 
 def test_get_rpc_creds():
-    dash_config = dash_conf()
-    creds = DashConfig.get_rpc_creds(dash_config, 'testnet')
+    pacprotocol_config = pacprotocol_conf()
+    creds = pacprotocolConfig.get_rpc_creds(pacprotocol_config, 'testnet')
 
     for key in ('user', 'password', 'port'):
         assert key in creds
-    assert creds.get('user') == 'dashrpc'
+    assert creds.get('user') == 'pacprotocolrpc'
     assert creds.get('password') == 'EwJeV3fZTyTVozdECF627BkBMnNDwQaVLakG3A4wXYyk'
     assert creds.get('port') == 29241
 
-    dash_config = dash_conf(rpcpassword='s00pers33kr1t', rpcport=8000)
-    creds = DashConfig.get_rpc_creds(dash_config, 'testnet')
+    pacprotocol_config = pacprotocol_conf(rpcpassword='s00pers33kr1t', rpcport=8000)
+    creds = pacprotocolConfig.get_rpc_creds(pacprotocol_config, 'testnet')
 
     for key in ('user', 'password', 'port'):
         assert key in creds
-    assert creds.get('user') == 'dashrpc'
+    assert creds.get('user') == 'pacprotocolrpc'
     assert creds.get('password') == 's00pers33kr1t'
     assert creds.get('port') == 8000
 
-    no_port_specified = re.sub('\nrpcport=.*?\n', '\n', dash_conf(), re.M)
-    creds = DashConfig.get_rpc_creds(no_port_specified, 'testnet')
+    no_port_specified = re.sub('\nrpcport=.*?\n', '\n', pacprotocol_conf(), re.M)
+    creds = pacprotocolConfig.get_rpc_creds(no_port_specified, 'testnet')
 
     for key in ('user', 'password', 'port'):
         assert key in creds
-    assert creds.get('user') == 'dashrpc'
+    assert creds.get('user') == 'pacprotocolrpc'
     assert creds.get('password') == 'EwJeV3fZTyTVozdECF627BkBMnNDwQaVLakG3A4wXYyk'
     assert creds.get('port') == 19998
 
@@ -65,7 +65,7 @@ def test_get_rpc_creds():
 def test_slurp_config_file():
     import tempfile
 
-    dash_config = """# basic settings
+    pacprotocol_config = """# basic settings
 #testnet=1 # TESTNET
 server=1
 printtoconsole=1
@@ -78,7 +78,7 @@ txindex=1 # enable transaction index
 """
 
     with tempfile.NamedTemporaryFile(mode='w') as temp:
-        temp.write(dash_config)
+        temp.write(pacprotocol_config)
         temp.flush()
-        conf = DashConfig.slurp_config_file(temp.name)
+        conf = pacprotocolConfig.slurp_config_file(temp.name)
         assert conf == expected_stripped_config
